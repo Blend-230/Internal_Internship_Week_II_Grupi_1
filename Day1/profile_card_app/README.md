@@ -1,19 +1,18 @@
-# profile_card_app
+# Profile Card App
 
-A new Flutter project created with FlutLab - https://flutlab.io
+Day 1 - Task 1 Flutter project for the Internal Internship.
 
-## Getting Started
+## What it includes
 
-A few resources to get you started if this is your first Flutter project:
+- A MaterialApp and Scaffold based profile screen.
+- A profile card for Art Halili with name, role, short description, and icons.
+- Row, Column, Padding, Card, Container, and spacing.
+- A button that updates the profile message and shows a SnackBar.
+- Responsive card width for mobile and wider screens.
 
-- https://flutter.dev/docs/get-started/codelab
-- https://flutter.dev/docs/cookbook
+## Run
 
-For help getting started with Flutter, view our
-https://flutter.dev/docs, which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-## Getting Started: FlutLab - Flutter Online IDE
-
-- How to use FlutLab? Please, view our https://flutlab.io/docs
-- Join the discussion and conversation on https://flutlab.io/residents
+```bash
+flutter pub get
+flutter run
+```
