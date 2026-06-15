@@ -101,3 +101,41 @@ Once Flutter SDK is installed and configured in your environment:
    ```bash
    flutter run
    ```
+
+---
+
+## 7. Day 1 - Task 2: Grade Calculator UI
+
+We have developed a second Flutter application: **Grade Calculator** (Llogaritësi i Notave) located under `Day1/grade_calculator_app/`.
+
+### Key Features & Requirements Met
+1. **Inputs**: The app takes three numerical grade inputs (for Matematikë, Programim, and Fizikë) using `TextFormField` within a `Form` state.
+2. **Validation**: Checks that:
+   * Fields are not empty.
+   * Input is a valid decimal number.
+   * Grades must be in the valid academic range (between `1.0` and `10.0`).
+3. **Average Calculation**: Calculates and displays the average score, formatted to **2 decimal places** (e.g. `8.33`).
+4. **Conditional Status**:
+   * **`Kalon`** (Pass) if the average is `6.0` or higher (rendered in green accent).
+   * **`Duhet përmirësim`** (Needs Improvement) if the average is below `6.0` (rendered in orange accent).
+5. **Micro-Animations**: Uses `AnimatedOpacity` to fade the results block into view once the calculate function is executed successfully.
+6. **Responsiveness**: Centered glassmorphic card layout that scales beautifully on desktop browsers and mobile screen heights.
+
+### How to Run Task 2
+#### Option A: Online (FlutLab / Replit)
+Upload the `Day1/grade_calculator_app/` folder to FlutLab or Replit and click **Run**.
+
+#### Option B: Local Setup
+1. Navigate to the calculator app directory:
+   ```bash
+   cd "Day1/grade_calculator_app"
+   ```
+2. Fetch dependencies:
+   ```bash
+   flutter pub get
+   ```
+3. Run the app:
+   ```bash
+   flutter run
+   ```
+
