@@ -130,59 +130,90 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
     super.dispose();
   }
 
+  // ── Validators (Commit 3) ──────────────────────────────────────────────────
+
+  String? _validateName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Emri nuk mund të jetë bosh.';
+    }
+    if (value.trim().length < 3) {
+      return 'Emri duhet të ketë të paktën 3 karaktere.';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email-i nuk mund të jetë bosh.';
+    }
+    final emailRegex = RegExp(r'^[\w.+-]+@[\w-]+\.[a-z]{2,}$', caseSensitive: false);
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Shkruani një email të vlefshëm (p.sh. emri@domain.com).';
+    }
+    return null;
+  }
+
+  String? _validateStudentId(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'ID e studentit nuk mund të jetë bosh.';
+    }
+    final idRegex = RegExp(r'^\d{6}$');
+    if (!idRegex.hasMatch(value.trim())) {
+      return 'ID duhet të jetë saktësisht 6 shifra (p.sh. 104523).';
+    }
+    return null;
+  }
+
+  String? _validateGpa(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'GPA nuk mund të jetë bosh.';
+    }
+    final gpa = double.tryParse(value.trim());
+    if (gpa == null) {
+      return 'Shkruani një numër të vlefshëm (p.sh. 8.5).';
+    }
+    if (gpa < 1.0 || gpa > 10.0) {
+      return 'GPA duhet të jetë ndërmjet 1.0 dhe 10.0.';
+    }
+    return null;
+  }
+
+  // ── Submit (Commit 3) ──────────────────────────────────────────────────────
+
   void _submitForm({required bool isBottomSheet}) {
-    // Simple state update for Commit 2. Regex and range validations will be added in Commit 3.
+    // Trigger all field validators via the Form key
+    if (!_formKey.currentState!.validate()) {
+      return; // Validators already display inline error messages
+    }
+
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final id = _idController.text.trim();
-    final gpaText = _gpaController.text.trim();
-
-    if (name.isEmpty || email.isEmpty || id.isEmpty || gpaText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Ju lutem plotësoni të gjitha fushat!"),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-      return;
-    }
-
-    final double? gpa = double.tryParse(gpaText);
-    if (gpa == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Ju lutem shkruani një notë (GPA) valide!"),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-      return;
-    }
+    final gpa = double.parse(_gpaController.text.trim());
 
     setState(() {
       _students.add(Student(
         id: id,
         name: name,
         email: email,
-        department: _selectedDepartment ?? "Shkenca Kompjuterike",
+        department: _selectedDepartment ?? 'Shkenca Kompjuterike',
         gpa: gpa,
       ));
-
-      // Reset Form fields
       _nameController.clear();
       _emailController.clear();
       _idController.clear();
       _gpaController.clear();
-      _selectedDepartment = "Shkenca Kompjuterike";
+      _selectedDepartment = 'Shkenca Kompjuterike';
     });
 
-    if (isBottomSheet) {
-      Navigator.pop(context);
-    }
+    if (isBottomSheet) Navigator.pop(context);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Studenti $name u regjistrua me sukses!"),
+        content: Text('Studenti $name u regjistrua me sukses! ✓'),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -238,36 +269,57 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
           TextFormField(
             controller: _nameController,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
-              labelText: "Emri dhe Mbiemri",
-              prefixIcon: Icon(Icons.person_outline),
+            validator: _validateName,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            decoration: InputDecoration(
+              labelText: 'Emri dhe Mbiemri',
+              hintText: 'p.sh. Valon Kastrati',
+              prefixIcon: const Icon(Icons.person_outline),
+              errorStyle: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 11,
+              ),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: "Email Adresa",
-              prefixIcon: Icon(Icons.email_outlined),
-              hintText: "emri@student.uni.edu",
+            validator: _validateEmail,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            decoration: InputDecoration(
+              labelText: 'Email Adresa',
+              hintText: 'emri@student.uni.edu',
+              prefixIcon: const Icon(Icons.email_outlined),
+              errorStyle: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 11,
+              ),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _idController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: "ID e Studentit",
-              prefixIcon: Icon(Icons.badge_outlined),
-              hintText: "p.sh. 104523",
+            validator: _validateStudentId,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            maxLength: 6,
+            decoration: InputDecoration(
+              labelText: 'ID e Studentit (6 shifra)',
+              hintText: 'p.sh. 104523',
+              prefixIcon: const Icon(Icons.badge_outlined),
+              counterText: '',
+              errorStyle: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 11,
+              ),
             ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _selectedDepartment,
             decoration: const InputDecoration(
-              labelText: "Departamenti",
+              labelText: 'Departamenti',
               prefixIcon: Icon(Icons.account_balance_outlined),
             ),
             dropdownColor: const Color(0xFF1A1C29),
@@ -278,19 +330,23 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
               );
             }).toList(),
             onChanged: (val) {
-              setState(() {
-                _selectedDepartment = val;
-              });
+              setState(() => _selectedDepartment = val);
             },
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _gpaController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              labelText: "GPA / Nota Mesatare",
-              prefixIcon: Icon(Icons.grade_outlined),
-              hintText: "5.0 - 10.0",
+            validator: _validateGpa,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            decoration: InputDecoration(
+              labelText: 'GPA / Nota Mesatare',
+              hintText: '1.0 – 10.0',
+              prefixIcon: const Icon(Icons.grade_outlined),
+              errorStyle: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 11,
+              ),
             ),
           ),
           const SizedBox(height: 24),
