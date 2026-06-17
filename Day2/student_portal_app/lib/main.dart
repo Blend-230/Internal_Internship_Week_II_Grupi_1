@@ -36,13 +36,27 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: const Color(0xFF1A1C29),
+          labelStyle: const TextStyle(color: Color(0xFF9E9E9E)),
+          hintStyle: const TextStyle(color: Color(0xFF4A4D60)),
           border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF2D3142)),
+          ),
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Color(0xFF2D3142)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Color(0xFF00ADB5), width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFFF2E93), width: 1.5),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFFF2E93), width: 2),
           ),
         ),
       ),
@@ -75,33 +89,34 @@ class StudentPortalScreen extends StatefulWidget {
 }
 
 class _StudentPortalScreenState extends State<StudentPortalScreen> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final List<Student> _students = [
     const Student(
-      id: "102345",
-      name: "Dones Ismaili",
-      email: "dones.ismaili@student.uni.edu",
-      department: "Shkenca Kompjuterike",
+      id: '102345',
+      name: 'Dones Ismaili',
+      email: 'dones.ismaili@student.uni.edu',
+      department: 'Shkenca Kompjuterike',
       gpa: 9.6,
     ),
     const Student(
-      id: "102890",
-      name: "Arbenita Gashi",
-      email: "arbenita.gashi@student.uni.edu",
-      department: "Inxhinieri Softuerike",
+      id: '102890',
+      name: 'Arbenita Gashi',
+      email: 'arbenita.gashi@student.uni.edu',
+      department: 'Inxhinieri Softuerike',
       gpa: 8.9,
     ),
     const Student(
-      id: "103112",
-      name: "Valon Kastrati",
-      email: "valon.kastrati@student.uni.edu",
-      department: "Matematikë",
+      id: '103112',
+      name: 'Valon Kastrati',
+      email: 'valon.kastrati@student.uni.edu',
+      department: 'Matematikë',
       gpa: 7.2,
     ),
     const Student(
-      id: "104230",
-      name: "Elsa Morina",
-      email: "elsa.morina@student.uni.edu",
-      department: "Fizikë",
+      id: '104230',
+      name: 'Elsa Morina',
+      email: 'elsa.morina@student.uni.edu',
+      department: 'Fizikë',
       gpa: 9.1,
     ),
   ];
@@ -199,6 +214,11 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
         department: _selectedDepartment ?? 'Shkenca Kompjuterike',
         gpa: gpa,
       ));
+      // Notify AnimatedList about the new item
+      _listKey.currentState?.insertItem(
+        _students.length - 1,
+        duration: const Duration(milliseconds: 400),
+      );
       _nameController.clear();
       _emailController.clear();
       _idController.clear();
@@ -558,7 +578,10 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
     );
   }
 
+  // ── Student list builders ──────────────────────────────────────────────────
+
   Widget _buildStudentGrid(List<Student> students) {
+    if (students.isEmpty) return _buildEmptyState();
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -569,23 +592,56 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
         childAspectRatio: 2.2,
       ),
       itemCount: students.length,
-      itemBuilder: (context, index) {
-        return _buildStudentCard(students[index]);
-      },
+      itemBuilder: (context, index) => _buildStudentCard(students[index]),
     );
   }
 
   Widget _buildStudentList(List<Student> students) {
-    return ListView.builder(
+    if (students.isEmpty) return _buildEmptyState();
+    return AnimatedList(
+      key: _listKey,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: students.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
-          child: _buildStudentCard(students[index]),
+      initialItemCount: students.length,
+      itemBuilder: (context, index, animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: FadeTransition(
+              opacity: animation,
+              child: _buildStudentCard(students[index]),
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          children: [
+            Icon(
+              Icons.people_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Nuk ka studentë të regjistruar.',
+              style: TextStyle(color: Color(0xFF6E7182), fontSize: 15),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Shtoni studentin e parë duke përdorur formularin.',
+              style: TextStyle(color: Color(0xFF4A4D60), fontSize: 12),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
