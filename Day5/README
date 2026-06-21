@@ -1,0 +1,31 @@
+Day 5 - Final Project: Task Manager App
+
+This Flutter app is a final project for Internal Internship Week II.
+
+Project idea:
+A simple Task Manager App where users can add, view, complete and delete tasks.
+
+MVP features:
+- Add new task
+- Show task list
+- Mark task as done
+- Delete task
+- Show task details screen
+
+Used concepts from Day 1-4:
+- Flutter UI widgets
+- TextField and controller
+- StatefulWidget and setState
+- ListView
+- Navigator.push and Navigator.pop
+- SnackBar feedback
+- Model class
+
+What can be added later:
+- API connection
+- Login system
+- Cloudflare D1 database
+- Better design
+
+Commit message:
+day5 final project
